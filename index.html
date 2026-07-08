@@ -22,54 +22,63 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text); padding: 2rem 1rem; min-height: 100vh; position: relative; }
-        .container { width: 100%; max-width: 1500px; margin: 0 auto; position: relative; }
+        body { background-color: var(--bg-color); color: var(--text); padding: 1rem 0.5rem; min-height: 100vh; position: relative; }
+        .container { width: 100%; max-width: 1500px; margin: 0 auto; position: relative; padding: 0 0.25rem; }
         
-        header { text-align: center; margin-bottom: 2rem; padding-right: 40px; }
-        header h1 { font-size: 2.5rem; color: var(--primary-hover); text-transform: uppercase; letter-spacing: 2px; }
+        header { text-align: center; margin-bottom: 1.5rem; padding: 0 45px 0 10px; }
+        header h1 { font-size: 1.6rem; color: var(--primary-hover); text-transform: uppercase; letter-spacing: 1px; word-wrap: break-word; }
+
+        @media (min-width: 768px) {
+            body { padding: 2rem 1rem; }
+            header h1 { font-size: 2.5rem; letter-spacing: 2px; }
+            header { padding-right: 40px; }
+        }
 
         .admin-toggle {
-            position: absolute; top: 10px; right: 10px; background: #334155; color: var(--text-muted);
-            border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            position: absolute; top: 0px; right: 5px; background: #334155; color: var(--text-muted);
+            border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 10;
         }
         .admin-toggle.active { background: var(--primary); color: white; }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+        .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 1024px) { .main-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
 
-        .game-title-header { font-size: 1.6rem; color: #fff; font-weight: 700; text-transform: uppercase; border-bottom: 3px solid #334155; padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .game-title-header { font-size: 1.3rem; color: #fff; font-weight: 700; text-transform: uppercase; border-bottom: 3px solid #334155; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        @media (min-width: 768px) { .game-title-header { font-size: 1.6rem; margin-bottom: 1.5rem; } }
         .libre-title { color: var(--primary-hover); }
         .threec-title { color: var(--gold); }
 
-        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid #334155; margin-bottom: 1.5rem; }
-        .card-title { font-size: 1.1rem; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1rem; border: 1px solid #334155; margin-bottom: 1rem; }
+        @media (min-width: 768px) { .card { padding: 1.5rem; margin-bottom: 1.5rem; } }
+        .card-title { font-size: 1.05rem; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
 
         .admin-section { display: none; margin-top: 2rem; border-top: 2px dashed #475569; padding-top: 2rem; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } }
-        .admin-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        @media (max-width: 640px) { .admin-card-grid { grid-template-columns: 1fr; } }
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 1024px) { .admin-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+        .admin-card-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 640px) { .admin-card-grid { grid-template-columns: 1fr 1fr; gap: 1rem; } }
 
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem; }
-        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; outline: none; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; outline: none; font-size: 0.95rem; }
         
-        .btn { background: var(--primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.9rem; }
+        .btn { background: var(--primary); color: white; border: none; padding: 0.75rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.95rem; }
         .btn:hover { background: var(--primary-hover); }
         .btn-danger { background: var(--danger); }
         .btn-danger:hover { background: #b91c1c; }
         .btn-group { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
 
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { padding: 0.6rem 0.8rem; background: #0f172a; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
-        td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #334155; vertical-align: middle; font-size: 0.95rem; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -0.5rem; padding: 0 0.5rem; }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 450px; }
+        th { padding: 0.6rem 0.5rem; background: #0f172a; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap; }
+        td { padding: 0.7rem 0.5rem; border-bottom: 1px solid #334155; vertical-align: middle; font-size: 0.9rem; white-space: nowrap; }
+        td strong { white-space: normal; }
 
-        .rank-badge { font-weight: bold; width: 25px; text-align: center; display: inline-block; }
+        .rank-badge { font-weight: bold; width: 22px; text-align: center; display: inline-block; }
         .top-1 { color: var(--gold); } .top-2 { color: var(--silver); } .top-3 { color: var(--bronze); }
         
-        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .status-badge { padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; display: inline-block; }
         .status-waiting { background: rgba(234, 179, 8, 0.2); color: var(--warning); }
         .status-playing { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
 
@@ -77,16 +86,16 @@
         .streak-win { background: rgba(16, 185, 129, 0.15); color: #10b981; }
         .streak-loss { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
-        .handicap-box { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent); padding: 8px; border-radius: 6px; font-size: 0.85rem; color: #fff; margin-bottom: 1rem; font-weight: 500; }
+        .handicap-box { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent); padding: 10px; border-radius: 6px; font-size: 0.85rem; color: #fff; margin-bottom: 1rem; font-weight: 500; word-break: break-word; }
 
         .history-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
         .history-item { 
-            font-size: 0.85rem; background: #0f172a; padding: 0.6rem 0.8rem; border-radius: 6px; margin-bottom: 0.5rem; 
-            border-left: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85rem; background: #0f172a; padding: 0.7rem 0.8rem; border-radius: 6px; margin-bottom: 0.5rem; 
+            border-left: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; gap: 8px;
         }
-        .history-content { flex: 1; padding-right: 10px; }
+        .history-content { flex: 1; padding-right: 5px; }
         .time-badge { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
-        .btn-delete-item { display: none; background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .btn-delete-item { background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 1rem; }
         .btn-delete-item:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         
         .sync-banner { 
@@ -95,7 +104,7 @@
             padding: 8px 15px; border-radius: 30px; 
             font-size: 0.8rem; display: flex; align-items: center; gap: 8px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 9999;
-            max-width: 300px; transition: all 0.3s ease;
+            max-width: 280px; transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -107,7 +116,7 @@
     </button>
 
     <header>
-        <h1><i class="fa-solid fa-cue-ball"></i> Arena Billiard Management Fcvl</h1>
+        <h1><i class="fa-solid fa-cue-ball"></i> Arena Billiard Management</h1>
     </header>
 
     <div class="main-grid">
@@ -115,15 +124,15 @@
             <div class="game-title-header libre-title"><i class="fa-solid fa-star"></i> Thể loại LIBRE</div>
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-user"></i> Xếp Hạng Solo (1v1)</div>
-                <div class="table-responsive"><table><thead><tr><th style="width: 50px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="libreSoloBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th style="width: 45px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="libreSoloBody"></tbody></table></div>
             </div>
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-users"></i> Xếp Hạng Đồng Đội (2v2)</div>
-                <div class="table-responsive"><table><thead><tr><th style="width: 50px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="libreTeamBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th style="width: 45px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="libreTeamBody"></tbody></table></div>
             </div>
             <div class="card" style="border-color: rgba(5, 150, 105, 0.3);">
                 <div class="card-title" style="color: var(--warning);"><i class="fa-solid fa-calendar-days"></i> Lịch Thi Đấu Trong Tuần (Libre)</div>
-                <div class="table-responsive"><table><thead><tr><th>Thời gian</th><th>Trận đấu</th><th>Kèo Chấp</th><th>Trạng thái</th><th class="admin-action-header" style="display:none; width:50px;">Xóa</th></tr></thead><tbody id="libreScheduleBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th>Thời gian</th><th>Trận đấu</th><th>Kèo Chấp</th><th>Trạng thái</th><th class="admin-action-header" style="display:none; width:45px; text-align:center;">Xóa</th></tr></thead><tbody id="libreScheduleBody"></tbody></table></div>
             </div>
             <div class="card"><div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu Libre</div><div class="history-list" id="libreHistoryList"></div></div>
         </div>
@@ -132,29 +141,29 @@
             <div class="game-title-header threec-title"><i class="fa-solid fa-trophy"></i> Thể loại 3 BĂNG (3C)</div>
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-user"></i> Xếp Hạng Solo (1v1)</div>
-                <div class="table-responsive"><table><thead><tr><th style="width: 50px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="threecSoloBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th style="width: 45px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="threecSoloBody"></tbody></table></div>
             </div>
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-users"></i> Xếp Hạng Đồng Đội (2v2)</div>
-                <div class="table-responsive"><table><thead><tr><th style="width: 50px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="threecTeamBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th style="width: 45px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th>Chuỗi</th><th style="text-align: right;">Elo</th></tr></thead><tbody id="threecTeamBody"></tbody></table></div>
             </div>
             <div class="card" style="border-color: rgba(245, 158, 11, 0.3);">
                 <div class="card-title" style="color: var(--warning);"><i class="fa-solid fa-calendar-days"></i> Lịch Thi Đấu Trong Tuần (3C)</div>
-                <div class="table-responsive"><table><thead><tr><th>Thời gian</th><th>Trận đấu</th><th>Kèo Chấp</th><th>Trạng thái</th><th class="admin-action-header" style="display:none; width:50px;">Xóa</th></tr></thead><tbody id="threecScheduleBody"></tbody></table></div>
+                <div class="table-responsive"><table><thead><tr><th>Thời gian</th><th>Trận đấu</th><th>Kèo Chấp</th><th>Trạng thái</th><th class="admin-action-header" style="display:none; width:45px; text-align:center;">Xóa</th></tr></thead><tbody id="threecScheduleBody"></tbody></table></div>
             </div>
             <div class="card"><div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu 3C</div><div class="history-list" id="threecHistoryList"></div></div>
         </div>
     </div>
 
     <div class="admin-section" id="adminSectionArea">
-        <div class="card" style="border: 2px solid var(--accent); background: #0f172a; margin-bottom: 2rem;">
-            <button class="btn" id="btnCloudSync" style="background: #2563eb; font-size: 1.1rem; padding: 1rem;" onclick="pushToGoogleSheet()">
-                <i class="fa-solid fa-cloud-arrow-up"></i> 🌟 ĐỒNG BỘ TOÀN BỘ DỮ LIỆU LÊN GOOGLE SHEET CLOUD 🌟
+        <div class="card" style="border: 2px solid var(--accent); background: #0f172a; margin-bottom: 1.5rem;">
+            <button class="btn" id="btnCloudSync" style="background: #2563eb; font-size: 1rem; padding: 0.85rem;" onclick="pushToGoogleSheet()">
+                <i class="fa-solid fa-cloud-arrow-up"></i> ĐỒNG BỘ LÊN GOOGLE SHEET CLOUD
             </button>
-            <p style="font-size:0.8rem; text-align:center; color: var(--text-muted); margin-top: 8px;">*Sau khi thêm thành viên, đổi điểm hoặc nhập kết quả trận đấu, bạn PHẢI nhấn nút này để cập nhật lên đám mây cho cả nhóm cùng thấy.*</p>
+            <p style="font-size:0.8rem; text-align:center; color: var(--text-muted); margin-top: 8px;">*Bạn PHẢI nhấn nút này để lưu dữ liệu lên đám mây sau khi cập nhật.*</p>
         </div>
 
-        <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-sliders"></i> BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN</h2>
+        <h2 style="font-size: 1.2rem; color: var(--accent); margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-sliders"></i> BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN</h2>
         
         <div class="admin-grid">
             <!-- LIBRE PANEL -->
@@ -174,12 +183,12 @@
                             <label style="font-size:0.85rem; color:var(--warning); font-weight:bold; display:block; margin-bottom:5px;">Lên Lịch Trận Đấu Mới (Libre)</label>
                             <div class="form-group"><label>Chọn hình thức</label><select id="libreSchedType" onchange="loadSchedDropdowns('libre')"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select></div>
                             <div class="form-group"><label>Chọn Ngày & Giờ</label><input type="date" id="libreSchedDate" style="margin-bottom:5px;"><input type="time" id="libreSchedTime"></div>
-                            <div class="form-group"><label>Cơ thủ 1 (Cửa trên/dưới)</label><select id="libreSchedP1" onchange="updateSchedHandicapHint('libre')"></select></div>
-                            <div class="form-group"><label>Cơ thủ 2 (Cửa trên/dưới)</label><select id="libreSchedP2" onchange="updateSchedHandicapHint('libre')"></select></div>
+                            <div class="form-group"><label>Cơ thủ 1</label><select id="libreSchedP1" onchange="updateSchedHandicapHint('libre')"></select></div>
+                            <div class="form-group"><label>Cơ thủ 2</label><select id="libreSchedP2" onchange="updateSchedHandicapHint('libre')"></select></div>
                             
                             <div class="handicap-box" id="libreSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
-                            <div class="form-group"><label>Thiết lập điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="libreSchedCustomHandicap" placeholder="Ví dụ: Chấp 15 điểm hoặc Đồng banh..."></div>
+                            <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="libreSchedCustomHandicap" placeholder="Ví dụ: Chấp 15 điểm..."></div>
                             <div class="form-group"><select id="libreSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('libre')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
@@ -205,7 +214,7 @@
                         <select id="libreManageTarget" style="margin-top:5px;"></select>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteEntry('libre')"><i class="fa-solid fa-trash"></i> Xóa thành viên</button>
+                        <button class="btn btn-danger" onclick="deleteEntry('libre')"><i class="fa-solid fa-trash"></i> Xóa</button>
                         <button class="btn" style="background:#4b5563;" onclick="editPoints('libre')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
                     </div>
                 </div>
@@ -228,12 +237,12 @@
                             <label style="font-size:0.85rem; color:var(--warning); font-weight:bold; display:block; margin-bottom:5px;">Lên Lịch Trận Đấu Mới (3C)</label>
                             <div class="form-group"><label>Chọn hình thức</label><select id="threecSchedType" onchange="loadSchedDropdowns('3c')"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select></div>
                             <div class="form-group"><label>Chọn Ngày & Giờ</label><input type="date" id="threecSchedDate" style="margin-bottom:5px;"><input type="time" id="threecSchedTime"></div>
-                            <div class="form-group"><label>Cơ thủ 1 (Cửa trên/dưới)</label><select id="threecSchedP1" onchange="updateSchedHandicapHint('3c')"></select></div>
-                            <div class="form-group"><label>Cơ thủ 2 (Cửa trên/dưới)</label><select id="threecSchedP2" onchange="updateSchedHandicapHint('3c')"></select></div>
+                            <div class="form-group"><label>Cơ thủ 1</label><select id="threecSchedP1" onchange="updateSchedHandicapHint('3c')"></select></div>
+                            <div class="form-group"><label>Cơ thủ 2</label><select id="threecSchedP2" onchange="updateSchedHandicapHint('3c')"></select></div>
                             
                             <div class="handicap-box" id="threecSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
-                            <div class="form-group"><label>Thiết lập điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="threecSchedCustomHandicap" placeholder="Ví dụ: Chấp 3 băng hoặc Đồng banh..."></div>
+                            <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="threecSchedCustomHandicap" placeholder="Ví dụ: Chấp 3 băng..."></div>
                             <div class="form-group"><select id="threecSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('3c')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
@@ -259,7 +268,7 @@
                         <select id="threecManageTarget" style="margin-top:5px;"></select>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-danger" onclick="deleteEntry('3c')"><i class="fa-solid fa-trash"></i> Xóa thành viên</button>
+                        <button class="btn btn-danger" onclick="deleteEntry('3c')"><i class="fa-solid fa-trash"></i> Xóa</button>
                         <button class="btn" style="background:#4b5563;" onclick="editPoints('3c')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
                     </div>
                 </div>
@@ -334,7 +343,7 @@
         const oldContent = syncBtn.innerHTML;
         
         syncBtn.disabled = true;
-        syncBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG ĐỒNG BỘ LÊN GOOGLE SHEET...`;
+        syncBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ĐANG ĐỒNG BỘ...`;
 
         try {
             const response = await fetch(GOOGLE_SHEET_URL, {
@@ -405,7 +414,6 @@
         const parts = dateStr.split('-');
         if(parts.length !== 3) return dateStr;
         
-        // Tạo biến ngày để tính Thứ
         const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
         const daysOfWeek = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
         const dayName = daysOfWeek[dateObj.getDay()];
@@ -447,16 +455,16 @@
             const statusText = s.status === 'playing' ? 'Đang đánh' : 'Đang chờ';
             const deleteActionStyle = isAdminActive ? 'display: table-cell;' : 'display: none;';
             
-            const displayTime = s.date ? `${s.time || ''} - ${formatDateVietnameseWithDay(s.date)}` : s.time;
-            const displayMatch = s.p1 ? `<strong>${s.p1}</strong> vs <strong>${s.p2}</strong>` : s.match;
+            const displayTime = s.date ? `${s.time || ''}<br><span style="font-size:0.75rem; color:var(--text-muted);">${formatDateVietnameseWithDay(s.date)}</span>` : s.time;
+            const displayMatch = s.p1 ? `<strong>${s.p1}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">vs</span><br><strong>${s.p2}</strong>` : s.match;
             
             schedBody.innerHTML += `<tr>
-                <td style="color:var(--accent); font-weight:600; font-size:0.85rem;">${displayTime}</td>
-                <td>${displayMatch}</td>
+                <td style="color:var(--accent); font-weight:600; font-size:0.85rem; line-height:1.3;">${displayTime}</td>
+                <td style="line-height:1.3;">${displayMatch}</td>
                 <td style="color:var(--warning); font-weight:bold; font-size:0.85rem;">${s.handicap || 'Đang tính'}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td class="admin-action-header" style="${deleteActionStyle} text-align:center;">
-                    <button class="btn-delete-item" style="display:inline-block;" onclick="deleteScheduleItem('${mode}', ${idx})"><i class="fa-solid fa-circle-xmark" style="color:var(--danger)"></i></button>
+                    <button class="btn-delete-item" onclick="deleteScheduleItem('${mode}', ${idx})"><i class="fa-solid fa-circle-xmark" style="color:var(--danger)"></i></button>
                 </td>
             </tr>`;
         });
@@ -517,11 +525,11 @@
         const handicap = diff; 
 
         if (handicap === 0) {
-            hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Hệ thống gợi ý: **Đồng banh** (Bằng điểm Elo)`;
+            hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Gợi ý: Đang bằng điểm Elo (Đồng banh).`;
         } else {
             const cuaTren = p1.points > p2.points ? p1.name : p2.name;
             const cuaDuoi = p1.points > p2.points ? p2.name : p1.name;
-            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Hệ thống gợi ý: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap} điểm</span> (Chênh lệch ${diff} Elo)`;
+            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Gợi ý: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap}đ</span> (${diff} Elo)`;
         }
     }
 
@@ -549,7 +557,7 @@
         } else {
             const cuaTren = p1.points > p2.points ? p1.name : p2.name;
             const cuaDuoi = p1.points > p2.points ? p2.name : p1.name;
-            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Gợi ý kèo chấp: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap} điểm</span>`;
+            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Kèo chấp: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap} điểm</span>`;
         }
     }
 
@@ -578,7 +586,7 @@
         const p2Name = document.getElementById(`${prefix}SchedP2`).value;
         let customHandicap = document.getElementById(`${prefix}SchedCustomHandicap`).value.trim();
 
-        if (!date || !time || !p1Name || !p2Name) return alert("Vui lòng điền chọn đầy đủ Ngày, Giờ và Đối thủ đấu!");
+        if (!date || !time || !p1Name || !p2Name) return alert("Vui lòng chọn đầy đủ Ngày, Giờ và Cơ thủ!");
         if (p1Name === p2Name) return alert("Hai đấu thủ không được trùng nhau!");
 
         if (!customHandicap) {
@@ -653,7 +661,7 @@
         let eloGain = Math.max(2, Math.round(32 * (1 - Ea)));
 
         const diff = Math.abs(Ra - Rb);
-        let handicapText = diff > 0 ? `(Kèo chấp Elo: ${diff}đ)` : `(Bằng Elo)`;
+        let handicapText = diff > 0 ? `(Elo: ${diff}đ)` : `(Bằng Elo)`;
 
         winner.points += eloGain;
         loser.points = Math.max(0, loser.points - eloGain); 
