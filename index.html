@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billiard Pro League - Tổng Hợp</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #059669;
+            --primary-hover: #10b981;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --gold: #f59e0b;
+            --silver: #cbd5e1;
+            --bronze: #b45309;
+            --danger: #ef4444;
+            --accent: #38bdf8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text); padding: 2rem 1rem; min-height: 100vh; }
+        .container { width: 100%; max-width: 1400px; margin: 0 auto; position: relative; }
+        
+        header { text-align: center; margin-bottom: 2rem; padding-right: 40px; }
+        header h1 { font-size: 2.5rem; color: var(--primary-hover); text-transform: uppercase; letter-spacing: 2px; }
+        header p { color: var(--text-muted); }
+
+        /* Nút Admin ẩn tinh tế */
+        .admin-toggle {
+            position: absolute; top: 10px; right: 10px; background: #334155; color: var(--text-muted);
+            border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 10;
+        }
+        .admin-toggle.active { background: var(--primary); color: white; }
+
+        /* Bố cục song song 2 thể loại game */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .game-title-header { font-size: 1.6rem; color: #fff; font-weight: 700; text-transform: uppercase; border-bottom: 3px solid #334155; padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .libre-title { color: var(--primary-hover); }
+        .threec-title { color: var(--gold); }
+
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid #334155; margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.1rem; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+
+        /* Bảng điều khiển Admin (ẩn mặc định) */
+        .admin-section { display: none; margin-top: 2rem; border-top: 2px dashed #475569; padding-top: 2rem; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } }
+        .admin-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 640px) { .admin-card-grid { grid-template-columns: 1fr; } }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem; }
+        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; outline: none; }
+        
+        .btn { background: var(--primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.9rem; }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-group { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 0.6rem 0.8rem; background: #0f172a; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #334155; vertical-align: middle; font-size: 0.95rem; }
+
+        .rank-badge { font-weight: bold; width: 25px; text-align: center; display: inline-block; }
+        .top-1 { color: var(--gold); } .top-2 { color: var(--silver); } .top-3 { color: var(--bronze); }
+        
+        .history-list { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .history-item { 
+            font-size: 0.85rem; background: #0f172a; padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.5rem; 
+            border-left: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center;
+        }
+        .history-content { flex: 1; padding-right: 10px; }
+        .btn-delete-history { display: none; background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .btn-delete-history:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="admin-toggle" id="adminToggleBtn" onclick="toggleAdminMode()" title="Chế độ Quản trị viên">
+        <i class="fa-solid fa-key"></i>
+    </button>
+
+    <header>
+        <h1><i class="fa-solid fa-cue-ball"></i> Arena Billiard Management</h1>
+        <p id="subHeader">Bảng tổng hợp xếp hạng & lịch sử thi đấu chính thức</p>
+    </header>
+
+    <div class="main-grid">
+        
+        <div>
+            <div class="game-title-header libre-title"><i class="fa-solid fa-star"></i> Thể loại LIBRE</div>
+            
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-user"></i> Xếp Hạng Solo (1v1)</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th style="width: 50px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th style="text-align: right;">Elo</th></tr>
+                        </thead>
+                        <tbody id="libreSoloBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-users"></i> Xếp Hạng Đồng Đội (2v2)</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th style="width: 50px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th style="text-align: right;">Elo</th></tr>
+                        </thead>
+                        <tbody id="libreTeamBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu Libre</div>
+                <div class="history-list" id="libreHistoryList"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="game-title-header threec-title"><i class="fa-solid fa-trophy"></i> Thể loại 3 BĂNG (3C)</div>
+            
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-user"></i> Xếp Hạng Solo (1v1)</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th style="width: 50px;">Hạng</th><th>Cơ thủ</th><th>T-B</th><th style="text-align: right;">Elo</th></tr>
+                        </thead>
+                        <tbody id="threecSoloBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-users"></i> Xếp Hạng Đồng Đội (2v2)</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th style="width: 50px;">Hạng</th><th>Cặp Đấu</th><th>T-B</th><th style="text-align: right;">Elo</th></tr>
+                        </thead>
+                        <tbody id="threecTeamBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu 3C</div>
+                <div class="history-list" id="threecHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-section" id="adminSectionArea">
+        <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-sliders"></i> BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN</h2>
+        
+        <div class="admin-grid">
+            <div class="card" style="border-color: rgba(5, 150, 105, 0.4);">
+                <div class="card-title libre-title"><i class="fa-solid fa-gear"></i> Công cụ cập nhật LIBRE</div>
+                
+                <div class="admin-card-grid">
+                    <div>
+                        <div class="form-group"><label>Tên cơ thủ/Cặp đội mới</label><input type="text" id="libreAddName" placeholder="Nhập tên..."></div>
+                        <div class="form-group">
+                            <label>Loại & Điểm đầu</label>
+                            <select id="libreAddType"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select>
+                            <input type="number" id="libreAddPoints" value="1200" style="margin-top:5px;">
+                        </div>
+                        <button class="btn" onclick="addNewEntry('libre')"><i class="fa-solid fa-plus"></i> Thêm mới</button>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Nhập trận đấu mới</label>
+                            <select id="libreMatchType" onchange="loadDropdowns('libre')"><option value="solo">Đấu Solo (1v1)</option><option value="team">Đấu Cặp (2v2)</option></select>
+                        </div>
+                        <div class="form-group"><label>Thắng</label><select id="libreMatchWinner"></select></div>
+                        <div class="form-group"><label>Thua</label><select id="libreMatchLoser"></select></div>
+                        <div class="form-group"><label>Ghi chú</label><input type="text" id="libreMatchNote" placeholder="Tỉ số, điểm chấp..."></div>
+                        <button class="btn" style="background:#2563eb;" onclick="recordMatch('libre')"><i class="fa-solid fa-check"></i> Lưu kết quả</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #475569;">
+                    <div class="form-group">
+                        <label>Sửa/Xóa thành viên Libre</label>
+                        <select id="libreManageType" onchange="loadManageDropdown('libre')"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select>
+                        <select id="libreManageTarget" style="margin-top:5px;"></select>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-danger" onclick="deleteEntry('libre')"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        <button class="btn" style="background:#4b5563;" onclick="editPoints('libre')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
+                <div class="card-title threec-title"><i class="fa-solid fa-gear"></i> Công cụ cập nhật 3 BĂNG (3C)</div>
+                
+                <div class="admin-card-grid">
+                    <div>
+                        <div class="form-group"><label>Tên cơ thủ/Cặp đội mới</label><input type="text" id="threecAddName" placeholder="Nhập tên..."></div>
+                        <div class="form-group">
+                            <label>Loại & Điểm đầu</label>
+                            <select id="threecAddType"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select>
+                            <input type="number" id="threecAddPoints" value="1200" style="margin-top:5px;">
+                        </div>
+                        <button class="btn" onclick="addNewEntry('3c')"><i class="fa-solid fa-plus"></i> Thêm mới</button>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Nhập trận đấu mới</label>
+                            <select id="threecMatchType" onchange="loadDropdowns('3c')"><option value="solo">Đấu Solo (1v1)</option><option value="team">Đấu Cặp (2v2)</option></select>
+                        </div>
+                        <div class="form-group"><label>Thắng</label><select id="threecMatchWinner"></select></div>
+                        <div class="form-group"><label>Thua</label><select id="threecMatchLoser"></select></div>
+                        <div class="form-group"><label>Ghi chú</label><input type="text" id="threecMatchNote" placeholder="Tỉ số, điểm chấp..."></div>
+                        <button class="btn" style="background:#2563eb;" onclick="recordMatch('3c')"><i class="fa-solid fa-check"></i> Lưu kết quả</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #475569;">
+                    <div class="form-group">
+                        <label>Sửa/Xóa thành viên 3C</label>
+                        <select id="threecManageType" onchange="loadManageDropdown('3c')"><option value="solo">Solo (1v1)</option><option value="team">Cặp (2v2)</option></select>
+                        <select id="threecManageTarget" style="margin-top:5px;"></select>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-danger" onclick="deleteEntry('3c')"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        <button class="btn" style="background:#4b5563;" onclick="editPoints('3c')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ADMIN_PASSWORD = "123456";
+    let isAdminActive = false;
+
+    const defaultData = {
+        libre: {
+            solo: [
+                { name: "Tuấn Linh", points: 1300, win: 15, loss: 2 },
+                { name: "Hoàng Nam", points: 1250, win: 12, loss: 5 },
+                { name: "Quốc Anh", points: 1200, win: 8, loss: 8 }
+            ],
+            team: [{ name: "Tuấn Linh + Hoàng Nam", points: 1250, win: 6, loss: 1 }],
+            history: [{ type: "solo", winner: "Tuấn Linh", loser: "Hoàng Nam", note: "Trận khai xuân (Hệ số: +16/-16 pts)" }]
+        },
+        '3c': {
+            solo: [
+                { name: "Tuấn Linh", points: 1200, win: 5, loss: 4 },
+                { name: "Minh Đức", points: 1260, win: 10, loss: 2 }
+            ],
+            team: [],
+            history: []
+        }
+    };
+
+    let db = JSON.parse(localStorage.getItem('billiardProDB')) || defaultData;
+
+    function toggleAdminMode() {
+        if (!isAdminActive) {
+            const pwd = prompt("Nhập mật khẩu Admin để mở các bảng điều khiển cập nhật:");
+            if (pwd === ADMIN_PASSWORD) {
+                isAdminActive = true;
+                document.getElementById('adminToggleBtn').classList.add('active');
+                document.getElementById('adminSectionArea').style.display = 'block';
+                document.getElementById('subHeader').innerText = "Chế độ Quản trị viên - Toàn quyền cập nhật dữ liệu cả 2 bàn";
+                initApp();
+            } else {
+                alert("Sai mật khẩu!");
+            }
+        } else {
+            isAdminActive = false;
+            document.getElementById('adminToggleBtn').classList.remove('active');
+            document.getElementById('adminSectionArea').style.display = 'none';
+            document.getElementById('subHeader').innerText = "Bảng tổng hợp xếp hạng & lịch sử thi đấu chính thức";
+            initApp();
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('billiardProDB', JSON.stringify(db));
+    }
+
+    function initApp() {
+        renderRankings('libre', 'libreSoloBody', 'libreTeamBody', 'libreHistoryList');
+        renderRankings('3c', 'threecSoloBody', 'threecTeamBody', 'threecHistoryList');
+        if (isAdminActive) {
+            loadDropdowns('libre');
+            loadDropdowns('3c');
+            loadManageDropdown('libre');
+            loadManageDropdown('3c');
+        }
+    }
+
+    function renderRankings(mode, soloId, teamId, historyId) {
+        const currentData = db[mode];
+        currentData.solo.sort((a,b) => b.points - a.points);
+        currentData.team.sort((a,b) => b.points - a.points);
+
+        // Render Solo
+        const soloBody = document.getElementById(soloId);
+        soloBody.innerHTML = currentData.solo.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Chưa có dữ liệu</td></tr>' : '';
+        currentData.solo.forEach((p, idx) => {
+            soloBody.innerHTML += `<tr>
+                <td><span class="rank-badge ${idx<3 ? 'top-'+(idx+1):''}">${idx<3 ? '<i class="fa-solid fa-medal"></i>' : idx+1}</span></td>
+                <td style="font-weight:600;">${p.name}</td>
+                <td>${p.win}-${p.loss}</td>
+                <td style="color:var(--primary-hover); font-weight:700; text-align: right;">${p.points} pts</td>
+            </tr>`;
+        });
+
+        // Render Team
+        const teamBody = document.getElementById(teamId);
+        teamBody.innerHTML = currentData.team.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Chưa có dữ liệu</td></tr>' : '';
+        currentData.team.forEach((t, idx) => {
+            teamBody.innerHTML += `<tr>
+                <td><span class="rank-badge ${idx<3 ? 'top-'+(idx+1):''}">${idx<3 ? '<i class="fa-solid fa-trophy"></i>' : idx+1}</span></td>
+                <td style="font-weight:600; color:var(--accent);">${t.name}</td>
+                <td>${t.win}-${t.loss}</td>
+                <td style="color:var(--primary-hover); font-weight:700; text-align: right;">${t.points} pts</td>
+            </tr>`;
+        });
+
+        // Render Lịch Sử
+        const historyList = document.getElementById(historyId);
+        historyList.innerHTML = currentData.history.length === 0 ? '<div style="color:var(--text-muted); text-align:center; padding:1rem; font-size:0.85rem;">Chưa có trận đấu nào</div>' : '';
+        
+        for (let i = currentData.history.length - 1; i >= 0; i--) {
+            const h = currentData.history[i];
+            const badgeType = h.type === 'solo' ? '[Solo]' : '[Cặp]';
+            const deleteBtnStyle = isAdminActive ? 'display: block;' : 'display: none;';
+            
+            historyList.innerHTML += `
+                <div class="history-item">
+                    <div class="history-content">
+                        <strong style="color:var(--accent);">${badgeType}</strong> 
+                        <span style="color:var(--primary-hover); font-weight:bold;">${h.winner}</span> 
+                        <span style="color:var(--text-muted);">thắng</span> 
+                        <span style="color:var(--danger); font-weight:bold;">${h.loser}</span>
+                        <div style="margin-top: 2px; font-size:0.75rem; color:var(--silver);">${h.note || ''}</div>
+                    </div>
+                    <button class="btn-delete-history" style="${deleteBtnStyle}" onclick="deleteHistoryItem('${mode}', ${i})" title="Xóa trận này">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function loadDropdowns(mode) {
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}MatchType`).value;
+        const items = db[mode][type];
+        const winnerSelect = document.getElementById(`${prefix}MatchWinner`);
+        const loserSelect = document.getElementById(`${prefix}MatchLoser`);
+        const optionsHtml = items.map(i => `<option value="${i.name}">${i.name} (${i.points} pts)</option>`).join('');
+        winnerSelect.innerHTML = optionsHtml;
+        loserSelect.innerHTML = optionsHtml;
+    }
+
+    function loadManageDropdown(mode) {
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}ManageType`).value;
+        const items = db[mode][type];
+        const manageSelect = document.getElementById(`${prefix}ManageTarget`);
+        manageSelect.innerHTML = items.map((i, idx) => `<option value="${idx}">${i.name} (${i.points} pts)</option>`).join('');
+    }
+
+    function addNewEntry(mode) {
+        if (!isAdminActive) return;
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}AddType`).value;
+        const name = document.getElementById(`${prefix}AddName`).value.trim();
+        const points = parseInt(document.getElementById(`${prefix}AddPoints`).value) || 1200;
+
+        if(!name) return alert("Vui lòng điền tên!");
+        if(db[mode][type].some(i => i.name.toLowerCase() === name.toLowerCase())) return alert("Tên đã tồn tại!");
+
+        db[mode][type].push({ name, points, win: 0, loss: 0 });
+        document.getElementById(`${prefix}AddName`).value = '';
+        saveData();
+        initApp();
+    }
+
+    function deleteEntry(mode) {
+        if (!isAdminActive) return;
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}ManageType`).value;
+        const idx = document.getElementById(`${prefix}ManageTarget`).value;
+        if (idx === "" || idx === null) return alert("Không có mục để xóa!");
+
+        const targetName = db[mode][type][idx].name;
+        if(confirm(`Xóa "${targetName}" khỏi danh sách ${mode.toUpperCase()}?`)) {
+            db[mode][type].splice(idx, 1);
+            saveData();
+            initApp();
+        }
+    }
+
+    function editPoints(mode) {
+        if (!isAdminActive) return;
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}ManageType`).value;
+        const idx = document.getElementById(`${prefix}ManageTarget`).value;
+        if (idx === "" || idx === null) return alert("Không có mục để sửa!");
+
+        const item = db[mode][type][idx];
+        const newPoints = prompt(`Nhập điểm Elo mới cho "${item.name}":`, item.points);
+        if (newPoints !== null) {
+            const parsedPoints = parseInt(newPoints);
+            if (isNaN(parsedPoints) || parsedPoints < 0) return alert("Điểm không hợp lệ!");
+            item.points = parsedPoints;
+            saveData();
+            initApp();
+        }
+    }
+
+    function deleteHistoryItem(mode, index) {
+        if (!isAdminActive) return;
+        if(confirm("Bạn có chắc chắn muốn xóa trận đấu này?")) {
+            db[mode].history.splice(index, 1);
+            saveData();
+            initApp();
+        }
+    }
+
+    function recordMatch(mode) {
+        if (!isAdminActive) return;
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const type = document.getElementById(`${prefix}MatchType`).value;
+        const winnerName = document.getElementById(`${prefix}MatchWinner`).value;
+        const loserName = document.getElementById(`${prefix}MatchLoser`).value;
+        const note = document.getElementById(`${prefix}MatchNote`).value.trim();
+
+        if (!winnerName || !loserName) return alert("Vui lòng thêm thành viên trước!");
+        if (winnerName === loserName) return alert("Người thắng và thua không được trùng nhau!");
+
+        const list = db[mode][type];
+        const winner = list.find(i => i.name === winnerName);
+        const loser = list.find(i => i.name === loserName);
+
+        const Ra = winner.points;
+        const Rb = loser.points;
+        const Ea = 1 / (1 + Math.pow(10, (Rb - Ra) / 400)); 
+
+        const K = 32; 
+        let eloGain = Math.round(K * (1 - Ea));
+        if (eloGain < 2) eloGain = 2; 
+
+        winner.points += eloGain;
+        loser.points = Math.max(0, loser.points - eloGain); 
+
+        winner.win += 1;
+        loser.loss += 1;
+
+        db[mode].history.push({ 
+            type, winner: winnerName, loser: loserName, 
+            note: `${note} (Hệ số dịch chuyển: +${eloGain}/-${eloGain} pts)`
+        });
+
+        document.getElementById(`${prefix}MatchNote`).value = '';
+        saveData();
+        initApp();
+    }
+
+    window.onload = initApp;
+</script>
+
+</body>
+</html>
