@@ -22,7 +22,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text); padding: 2rem 1rem; min-height: 100vh; }
+        body { background-color: var(--bg-color); color: var(--text); padding: 2rem 1rem; min-height: 100vh; position: relative; }
         .container { width: 100%; max-width: 1500px; margin: 0 auto; position: relative; }
         
         header { text-align: center; margin-bottom: 2rem; padding-right: 40px; }
@@ -84,28 +84,30 @@
         .btn-delete-item { display: none; background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
         .btn-delete-item:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
         
-        .sync-banner { background: #1e1b4b; border: 1px solid #4338ca; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        /* ĐÃ ĐƯỢC CHỈNH SỬA: Thu nhỏ trạng thái sync và cố định dưới cùng góc phải */
+        .sync-banner { 
+            position: fixed; bottom: 15px; right: 15px; 
+            background: #1e1b4b; border: 1px solid #4338ca; 
+            padding: 8px 15px; border-radius: 30px; 
+            font-size: 0.8rem; display: flex; align-items: center; gap: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 9999;
+            max-width: 300px; transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button class="admin-toggle" id="adminToggleBtn" onclick="toggleAdminMode()" title="Bảng xếp hạng">
+    <button class="admin-toggle" id="adminToggleBtn" onclick="toggleAdminMode()" title="Chế độ Quản trị viên">
         <i class="fa-solid fa-key"></i>
     </button>
 
     <header>
         <h1><i class="fa-solid fa-cue-ball"></i> Arena Billiard Management</h1>
-        <p id="subHeader">Hệ thống bảng xếp hạng</p>
+        <p id="subHeader">Hệ thống bảng xếp hạng BILLIAR</p>
     </header>
 
-    <div class="sync-banner" id="syncBanner">
-        <i class="fa-solid fa-spinner fa-spin"></i> Đang kết nối và tải dữ liệu từ Google Sheets Cloud...
-    </div>
-
-    <!-- KHU VỰC HIỂN THỊ CHÍNH -->
     <div class="main-grid">
-        <!-- CỘT TRÁI: LIBRE -->
         <div>
             <div class="game-title-header libre-title"><i class="fa-solid fa-star"></i> Thể loại LIBRE</div>
             <div class="card">
@@ -123,7 +125,6 @@
             <div class="card"><div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu Libre</div><div class="history-list" id="libreHistoryList"></div></div>
         </div>
 
-        <!-- CỘT PHẢI: 3 BĂNG (3C) -->
         <div>
             <div class="game-title-header threec-title"><i class="fa-solid fa-trophy"></i> Thể loại 3 BĂNG (3C)</div>
             <div class="card">
@@ -142,9 +143,7 @@
         </div>
     </div>
 
-    <!-- KHU VỰC ĐIỀU KHIỂN QUẢN TRỊ -->
     <div class="admin-section" id="adminSectionArea">
-        <!-- NÚT ĐỒNG BỘ ĐÁM MÂY LÊN GOOGLE SHEETS -->
         <div class="card" style="border: 2px solid var(--accent); background: #0f172a; margin-bottom: 2rem;">
             <button class="btn" id="btnCloudSync" style="background: #2563eb; font-size: 1.1rem; padding: 1rem;" onclick="pushToGoogleSheet()">
                 <i class="fa-solid fa-cloud-arrow-up"></i> 🌟 ĐỒNG BỘ TOÀN BỘ DỮ LIỆU LÊN GOOGLE SHEET CLOUD 🌟
@@ -155,7 +154,6 @@
         <h2 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-sliders"></i> BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN</h2>
         
         <div class="admin-grid">
-            <!-- QUẢN LÝ CHO LIBRE -->
             <div class="card" style="border-color: rgba(5, 150, 105, 0.4);">
                 <div class="card-title libre-title"><i class="fa-solid fa-gear"></i> Công cụ cập nhật LIBRE</div>
                 <div class="admin-card-grid">
@@ -200,7 +198,6 @@
                 </div>
             </div>
 
-            <!-- QUẢN LÝ CHO 3C -->
             <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
                 <div class="card-title threec-title"><i class="fa-solid fa-gear"></i> Công cụ cập nhật 3 BĂNG (3C)</div>
                 <div class="admin-card-grid">
@@ -248,13 +245,16 @@
     </div>
 </div>
 
+<div class="sync-banner" id="syncBanner">
+    <i class="fa-solid fa-spinner fa-spin"></i> Đang tải từ Cloud...
+</div>
+
 <script>
     // --- 🛑 DÁN ĐƯỜNG LINK WEB APP CỦA GOOGLE SHEETS VÀO ĐÂY 🛑 ---
     const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx-5u06j1KyTUdjdRHlN_UEzG2pGm1hNomJk97cIkhypHVLI6XuvZ1X96KGKIEOXePa/exec";
     const ADMIN_PASSWORD = "123456";
     let isAdminActive = false;
 
-    // Dữ liệu dự phòng nếu Google Sheet trống
     const defaultData = {
         libre: { solo: [], team: [], schedule: [], history: [] },
         '3c': { solo: [], team: [], schedule: [], history: [] }
@@ -262,11 +262,10 @@
 
     let db = defaultData;
 
-    // Hàm tự động chạy khi mở trang web: Lấy dữ liệu từ Google Sheet
     async function pullFromGoogleSheet() {
         const banner = document.getElementById('syncBanner');
         if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("DÁN_LINK")) {
-            banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> Bạn chưa dán link cấu hình Google Sheets vào mã nguồn!`;
+            banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> Thiếu link Sheet!`;
             initApp();
             return;
         }
@@ -277,21 +276,22 @@
             
             if (cloudData && (cloudData.libre || cloudData['3c'])) {
                 db = cloudData;
-                banner.innerHTML = `<i class="fa-solid fa-cloud-check" style="color:var(--primary-hover)"></i> Đồng bộ đám mây thành công! (Dữ liệu thời gian thực)`;
-                banner.style.background = "rgba(5, 150, 105, 0.1)";
+                banner.innerHTML = `<i class="fa-solid fa-cloud" style="color:var(--primary-hover)"></i> Đã đồng bộ Cloud`;
+                banner.style.background = "rgba(15, 23, 42, 0.9)";
                 banner.style.borderColor = "var(--primary)";
             } else {
-                banner.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--warning)"></i> Trang tính trống. Đang sử dụng dữ liệu khởi tạo ban đầu.`;
+                banner.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--warning)"></i> Trang tính trống`;
             }
         } catch (error) {
             console.error("Lỗi lấy dữ liệu đám mây:", error);
-            banner.innerHTML = `<i class="fa-solid fa-wifi-slash" style="color:var(--danger)"></i> Không thể kết nối Cloud. Đang sử dụng dữ liệu tạm thời trên máy.`;
+            banner.innerHTML = `<i class="fa-solid fa-wifi-slash" style="color:var(--danger)"></i> Mất kết nối Cloud`;
+            banner.style.background = "rgba(239, 68, 68, 0.1)";
+            banner.style.borderColor = "var(--danger)";
             db = JSON.parse(localStorage.getItem('billiardProDB')) || defaultData;
         }
         initApp();
     }
 
-    // Hàm của Admin gửi dữ liệu ngược lên Google Sheet khi có thay đổi
     async function pushToGoogleSheet() {
         if (!isAdminActive) return;
         const syncBtn = document.getElementById('btnCloudSync');
@@ -303,17 +303,16 @@
         try {
             const response = await fetch(GOOGLE_SHEET_URL, {
                 method: "POST",
-                mode: "no-cors", // Bỏ qua chặn CORS của trình duyệt
+                mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(db)
             });
             
-            // Lưu thêm bản sao phụ ở máy Admin
             localStorage.setItem('billiardProDB', JSON.stringify(db));
-            alert("Đã đồng bộ lên Google Sheets thành công! Toàn bộ thành viên truy cập từ bây giờ sẽ thấy dữ liệu mới.");
+            alert("Đã đồng bộ lên Google Sheets thành công!");
         } catch (error) {
             console.error("Lỗi đồng bộ đám mây:", error);
-            alert("Lỗi đồng bộ! Kiểm tra lại đường dẫn Google Sheet hoặc kết nối mạng.");
+            alert("Lỗi đồng bộ! Hãy kiểm tra kết nối mạng.");
         } finally {
             syncBtn.disabled = false;
             syncBtn.innerHTML = oldContent;
@@ -510,7 +509,6 @@
         initApp();
     }
 
-    // Tự động chạy tải dữ liệu đám mây khi mở Web
     window.onload = pullFromGoogleSheet;
 </script>
 
