@@ -96,8 +96,10 @@
         }
         .history-content { flex: 1; padding-right: 5px; }
         .time-badge { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
-        .btn-delete-item { background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 1rem; }
+        .history-actions { display: flex; gap: 5px; }
+        .btn-delete-item, .btn-edit-item { background: transparent; color: var(--text-muted); border: none; cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 1rem; }
         .btn-delete-item:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .btn-edit-item:hover { color: var(--accent); background: rgba(56, 189, 248, 0.1); }
         
         .sync-banner { 
             position: fixed; bottom: 15px; right: 15px; 
@@ -195,16 +197,27 @@
                     </div>
                     <div>
                         <div class="form-group">
-                            <label>Nhập kết quả trận đấu</label>
+                            <label id="libreMatchFormTitle" style="font-weight: bold; color: var(--accent);">Nhập kết quả trận đấu</label>
+                            <input type="hidden" id="libreEditMatchIndex" value="-1">
                             <select id="libreMatchType" onchange="loadDropdowns('libre')"><option value="solo">Đấu Solo (1v1)</option><option value="team">Đấu Cặp (2v2)</option></select>
                         </div>
                         <div class="form-group"><label>Thắng</label><select id="libreMatchWinner" onchange="updateHandicapHint('libre')"></select></div>
                         <div class="form-group"><label>Thua</label><select id="libreMatchLoser" onchange="updateHandicapHint('libre')"></select></div>
+                        <div class="form-group">
+                            <label>Hình thức đấu</label>
+                            <select id="libreMatchHandicapType" onchange="updateHandicapHint('libre')">
+                                <option value="handicap">Chấp điểm ngoài đời (Đánh đồng Elo)</option>
+                                <option value="equal">Không chấp điểm (Tính theo Elo gốc)</option>
+                            </select>
+                        </div>
                         
                         <div class="handicap-box" id="libreHandicapHint"><i class="fa-solid fa-calculator"></i> Chọn người chơi để tính tỷ lệ kèo chấp.</div>
 
                         <div class="form-group"><label>Ghi chú</label><input type="text" id="libreMatchNote" placeholder="Tỉ số, điểm chấp..."></div>
-                        <button class="btn" style="background:#2563eb;" onclick="recordMatch('libre')"><i class="fa-solid fa-check"></i> Lưu kết quả trận</button>
+                        <div class="btn-group">
+                            <button class="btn" style="background:#2563eb;" id="libreBtnSaveMatch" onclick="recordMatch('libre')"><i class="fa-solid fa-check"></i> Lưu kết quả trận</button>
+                            <button class="btn btn-danger" style="display:none;" id="libreBtnCancelEdit" onclick="cancelEditMatch('libre')">Hủy</button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #475569;">
@@ -215,7 +228,7 @@
                     </div>
                     <div class="btn-group">
                         <button class="btn btn-danger" onclick="deleteEntry('libre')"><i class="fa-solid fa-trash"></i> Xóa</button>
-                        <button class="btn" style="background:#4b5563;" onclick="editPoints('libre')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
+                        <button class="btn" style="background:#4b5563;" onclick="editPoints('libre')"><i class="fa-solid fa-edit"></i> Sửa Điểm Gốc</button>
                     </div>
                 </div>
             </div>
@@ -248,16 +261,27 @@
                     </div>
                     <div>
                         <div class="form-group">
-                            <label>Nhập kết quả trận đấu</label>
+                            <label id="threecMatchFormTitle" style="font-weight: bold; color: var(--accent);">Nhập kết quả trận đấu</label>
+                            <input type="hidden" id="threecEditMatchIndex" value="-1">
                             <select id="threecMatchType" onchange="loadDropdowns('3c')"><option value="solo">Đấu Solo (1v1)</option><option value="team">Đấu Cặp (2v2)</option></select>
                         </div>
                         <div class="form-group"><label>Thắng</label><select id="threecMatchWinner" onchange="updateHandicapHint('3c')"></select></div>
                         <div class="form-group"><label>Thua</label><select id="threecMatchLoser" onchange="updateHandicapHint('3c')"></select></div>
+                        <div class="form-group">
+                            <label>Hình thức đấu</label>
+                            <select id="threecMatchHandicapType" onchange="updateHandicapHint('3c')">
+                                <option value="handicap">Chấp điểm ngoài đời (Đánh đồng Elo)</option>
+                                <option value="equal">Không chấp điểm (Tính theo Elo gốc)</option>
+                            </select>
+                        </div>
                         
                         <div class="handicap-box" id="threecHandicapHint"><i class="fa-solid fa-calculator"></i> Chọn người chơi để tính tỷ lệ kèo chấp.</div>
 
                         <div class="form-group"><label>Ghi chú</label><input type="text" id="threecMatchNote" placeholder="Tỉ số, điểm chấp..."></div>
-                        <button class="btn" style="background:#2563eb;" onclick="recordMatch('3c')"><i class="fa-solid fa-check"></i> Lưu kết quả trận</button>
+                        <div class="btn-group">
+                            <button class="btn" style="background:#2563eb;" id="threecBtnSaveMatch" onclick="recordMatch('3c')"><i class="fa-solid fa-check"></i> Lưu kết quả trận</button>
+                            <button class="btn btn-danger" style="display:none;" id="threecBtnCancelEdit" onclick="cancelEditMatch('3c')">Hủy</button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #475569;">
@@ -268,7 +292,7 @@
                     </div>
                     <div class="btn-group">
                         <button class="btn btn-danger" onclick="deleteEntry('3c')"><i class="fa-solid fa-trash"></i> Xóa</button>
-                        <button class="btn" style="background:#4b5563;" onclick="editPoints('3c')"><i class="fa-solid fa-edit"></i> Sửa Điểm</button>
+                        <button class="btn" style="background:#4b5563;" onclick="editPoints('3c')"><i class="fa-solid fa-edit"></i> Sửa Điểm Gốc</button>
                     </div>
                 </div>
             </div>
@@ -297,9 +321,60 @@
             ['solo', 'team'].forEach(type => {
                 if(db[mode] && db[mode][type]) {
                     db[mode][type].forEach(item => {
-                        if (item.streak === undefined) item.streak = 0; 
+                        if (item.streak === undefined) item.streak = 0;
+                        if (item.initialPoints === undefined) item.initialPoints = item.points || 1200; 
                     });
                 }
+            });
+            if(!db[mode].history) db[mode].history = [];
+            if(!db[mode].schedule) db[mode].schedule = [];
+        });
+    }
+
+    // HÀM QUAN TRỌNG: Tự động chạy lại toàn bộ lịch sử trận đấu để tính điểm Elo và Chuỗi (Streak) từ đầu
+    function recalculateAllElo() {
+        ['libre', '3c'].forEach(mode => {
+            // 1. Reset dữ liệu của toàn bộ cơ thủ về trạng thái ban đầu (Điểm gốc)
+            ['solo', 'team'].forEach(type => {
+                db[mode][type].forEach(p => {
+                    p.points = p.initialPoints || 1200;
+                    p.win = 0;
+                    p.loss = 0;
+                    p.streak = 0;
+                });
+            });
+
+            // 2. Chạy vòng lặp xử lý tuần tự qua từng trận đấu trong lịch sử để tính điểm lũy tiến
+            db[mode].history.forEach(match => {
+                const list = db[mode][match.type];
+                const winner = list.find(i => i.name === match.winner);
+                const loser = list.find(i => i.name === match.loser);
+
+                // Nếu cơ thủ không tồn tại (đã bị xóa khỏi hệ thống), bỏ qua trận đấu này
+                if (!winner || !loser) return;
+
+                let eloGain = 0;
+                if (match.handicapType === 'handicap') {
+                    eloGain = 16; // Kèo chấp cân bằng Elo cố định 16 điểm
+                } else {
+                    const Ra = winner.points;
+                    const Rb = loser.points;
+                    const Ea = 1 / (1 + Math.pow(10, (Rb - Ra) / 400));
+                    eloGain = Math.max(2, Math.round(32 * (1 - Ea)));
+                }
+
+                // Tiến hành áp dụng điểm số và thống kê lũy tiến
+                winner.points += eloGain;
+                loser.points = Math.max(0, loser.points - eloGain);
+                winner.win += 1;
+                loser.loss += 1;
+
+                if (winner.streak >= 0) winner.streak += 1; else winner.streak = 1;
+                if (loser.streak <= 0) loser.streak -= 1; else loser.streak = -1;
+                
+                // Cập nhật lại chuỗi tag text hiển thị trong log lịch sử để phản ánh đúng số điểm mới sau khi tính lại
+                const modeText = match.handicapType === 'handicap' ? 'Chấp điểm (Kèo cân bằng Elo)' : 'Không chấp điểm';
+                match.note = `[${modeText}] ${match.rawNote ? match.rawNote + ' ' : ''}(+${eloGain}/-${eloGain} pts)`;
             });
         });
     }
@@ -319,6 +394,7 @@
             if (cloudData && (cloudData.libre || cloudData['3c'])) {
                 db = cloudData;
                 normalizeData();
+                recalculateAllElo(); // Đồng bộ xong chạy tính toán lại ngay
                 banner.innerHTML = `<i class="fa-solid fa-cloud" style="color:var(--primary-hover)"></i> Đã đồng bộ Cloud`;
                 banner.style.background = "rgba(15, 23, 42, 0.9)";
                 banner.style.borderColor = "var(--primary)";
@@ -332,6 +408,7 @@
             banner.style.borderColor = "var(--danger)";
             db = JSON.parse(localStorage.getItem('billiardProDB')) || defaultData;
             normalizeData();
+            recalculateAllElo();
         }
         initApp();
     }
@@ -377,14 +454,12 @@
             isAdminActive = false;
             document.getElementById('adminToggleBtn').classList.remove('active');
             document.getElementById('adminSectionArea').style.display = 'none';
+            cancelEditMatch('libre'); cancelEditMatch('3c');
             initApp();
         }
     }
 
     function initApp() {
-        if (!db.libre.schedule) db.libre.schedule = [];
-        if (!db['3c'].schedule) db['3c'].schedule = [];
-        
         renderRankings('libre', 'libreSoloBody', 'libreTeamBody', 'libreHistoryList', 'libreScheduleBody');
         renderRankings('3c', 'threecSoloBody', 'threecTeamBody', 'threecHistoryList', 'threecScheduleBody');
         if (isAdminActive) {
@@ -450,55 +525,31 @@
         const schedBody = document.getElementById(scheduleId);
         schedBody.innerHTML = '';
         
-        // Lấy thông tin thời gian hiện tại để so sánh tự động
         const now = new Date();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-
         let visibleCount = 0;
 
         currentData.schedule.forEach((s, idx) => {
-            // Kiểm tra ẩn lịch cũ khi sang ngày mới
-            if (s.date && s.date < todayStr) {
-                return; // Bỏ qua không render nếu trận đấu thuộc ngày hôm trước
-            }
-
+            if (s.date && s.date < todayStr) return; 
             visibleCount++;
 
-            // Kiểm tra xem trận đấu đã quá 2 tiếng (60 phút) chưa
             let statusClass = s.status === 'playing' ? 'status-playing' : 'status-waiting';
             let statusText = s.status === 'playing' ? 'Đang đánh' : 'Đang chờ';
             let resultText = '';
 
             if (s.date && s.time) {
                 const matchDateTime = new Date(`${s.date}T${s.time}`);
-                const diffMs = now - matchDateTime;
-                const diffMinutes = Math.floor(diffMs / 1000 / 60);
-
-                if (diffMinutes >= 120) { // Quá 2 tiếng
-                    statusClass = 'status-finished';
-                    statusText = 'Kết thúc';
-                    
-                    // Tìm kiếm kết quả tương ứng trong nhật ký trận đấu lịch sử để hiển thị bên cạnh
-                    const foundHistory = currentData.history.find(h => 
-                        (h.winner === s.p1 && h.loser === s.p2) || (h.winner === s.p2 && h.loser === s.p1)
-                    );
-                    
-                    if (foundHistory) {
-                        // Tách phần ghi chú tỉ số ban đầu nếu có từ chuỗi note lịch sử
-                        resultText = `<br><span style="color:var(--primary-hover); font-size:0.8rem; font-weight:bold;"><i class="fa-solid fa-square-poll-horizontal"></i> ${foundHistory.winner} thắng</span>`;
-                    } else {
-                        resultText = `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Hết giờ)</span>`;
-                    }
+                if (Math.floor((now - matchDateTime) / 1000 / 60) >= 120) { 
+                    statusClass = 'status-finished'; statusText = 'Kết thúc';
+                    const foundHistory = currentData.history.find(h => (h.winner === s.p1 && h.loser === s.p2) || (h.winner === s.p2 && h.loser === s.p1));
+                    resultText = foundHistory ? `<br><span style="color:var(--primary-hover); font-size:0.8rem; font-weight:bold;"><i class="fa-solid fa-square-poll-horizontal"></i> ${foundHistory.winner} thắng</span>` : `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Hết giờ)</span>`;
                 }
             }
 
             const deleteActionStyle = isAdminActive ? 'display: table-cell;' : 'display: none;';
-            const displayTime = s.date ? `${s.time || ''}<br><span style="font-size:0.75rem; color:var(--text-muted);">${formatDateVietnameseWithDay(s.date)}</span>` : s.time;
-            const displayMatch = s.p1 ? `<strong>${s.p1}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">vs</span><br><strong>${s.p2}</strong>` : s.match;
-            
             schedBody.innerHTML += `<tr>
-                <td style="color:var(--accent); font-weight:600; font-size:0.85rem; line-height:1.3;">${displayTime}</td>
-                <td style="line-height:1.3;">${displayMatch}</td>
+                <td style="color:var(--accent); font-weight:600; font-size:0.85rem; line-height:1.3;">${s.time || ''}<br><span style="font-size:0.75rem; color:var(--text-muted);">${formatDateVietnameseWithDay(s.date)}</span></td>
+                <td style="line-height:1.3;"><strong>${s.p1}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">vs</span><br><strong>${s.p2}</strong></td>
                 <td style="color:var(--warning); font-weight:bold; font-size:0.85rem;">${s.handicap || 'Đang tính'}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span>${resultText}</td>
                 <td class="admin-action-header" style="${deleteActionStyle} text-align:center;">
@@ -507,15 +558,13 @@
             </tr>`;
         });
 
-        if (visibleCount === 0) {
-            schedBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:0.5rem;">Không có lịch thi đấu tuần này</td></tr>';
-        }
+        if (visibleCount === 0) schedBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:0.5rem;">Không có lịch thi đấu tuần này</td></tr>';
 
         const historyList = document.getElementById(historyId);
         historyList.innerHTML = currentData.history.length === 0 ? '<div style="color:var(--text-muted); text-align:center; padding:1rem;">Chưa có trận đấu nào</div>' : '';
         for (let i = currentData.history.length - 1; i >= 0; i--) {
             const h = currentData.history[i];
-            const deleteBtnStyle = isAdminActive ? 'display: block;' : 'display: none;';
+            const actionStyle = isAdminActive ? 'display: block;' : 'display: none;';
             historyList.innerHTML += `
                 <div class="history-item">
                     <div class="history-content">
@@ -524,7 +573,10 @@
                         <span style="color:var(--primary-hover); font-weight:bold;">${h.winner}</span> thắng <span style="color:var(--danger); font-weight:bold;">${h.loser}</span>
                         <div style="margin-top: 2px; font-size:0.75rem; color:var(--silver);">${h.note || ''}</div>
                     </div>
-                    <button class="btn-delete-item" style="${deleteBtnStyle}" onclick="deleteHistoryItem('${mode}', ${i})"><i class="fa-solid fa-trash-can"></i></button>
+                    <div class="history-actions" style="${actionStyle}">
+                        <button class="btn-edit-item" onclick="startEditMatch('${mode}', ${i})" title="Sửa kết quả"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-delete-item" onclick="deleteHistoryItem('${mode}', ${i})" title="Xóa trận đấu"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
                 </div>`;
         }
     }
@@ -555,23 +607,17 @@
         const hintBox = document.getElementById(`${prefix}SchedHandicapHint`);
 
         if (!p1Name || !p2Name || p1Name === p2Name) {
-            hintBox.innerHTML = `<i class="fa-solid fa-calculator"></i> Vui lòng chọn 2 cơ thủ khác nhau.`;
-            return;
+            hintBox.innerHTML = `<i class="fa-solid fa-calculator"></i> Vui lòng chọn 2 cơ thủ khác nhau.`; return;
         }
-
-        const list = db[mode][type];
-        const p1 = list.find(i => i.name === p1Name);
-        const p2 = list.find(i => i.name === p2Name);
-
+        const p1 = db[mode][type].find(i => i.name === p1Name);
+        const p2 = db[mode][type].find(i => i.name === p2Name);
         const diff = Math.abs(p1.points - p2.points);
-        const handicap = diff; 
 
-        if (handicap === 0) {
-            hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Gợi ý: Đang bằng điểm Elo (Đồng banh).`;
-        } else {
+        if (diff === 0) hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Gợi ý: Đang bằng điểm Elo (Đồng banh).`;
+        else {
             const cuaTren = p1.points > p2.points ? p1.name : p2.name;
             const cuaDuoi = p1.points > p2.points ? p2.name : p1.name;
-            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Gợi ý: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap}đ</span> (${diff} Elo)`;
+            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Gợi ý: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${diff}đ</span> (${diff} Elo)`;
         }
     }
 
@@ -580,33 +626,32 @@
         const type = document.getElementById(`${prefix}MatchType`).value;
         const winnerName = document.getElementById(`${prefix}MatchWinner`).value;
         const loserName = document.getElementById(`${prefix}MatchLoser`).value;
+        const handicapType = document.getElementById(`${prefix}MatchHandicapType`).value;
         const hintBox = document.getElementById(`${prefix}HandicapHint`);
 
         if (!winnerName || !loserName || winnerName === loserName) {
-            hintBox.innerHTML = `<i class="fa-solid fa-calculator"></i> Vui lòng chọn 2 đối thủ khác nhau.`;
-            return;
+            hintBox.innerHTML = `<i class="fa-solid fa-calculator"></i> Vui lòng chọn 2 đối thủ khác nhau.`; return;
         }
-
-        const list = db[mode][type];
-        const p1 = list.find(i => i.name === winnerName);
-        const p2 = list.find(i => i.name === loserName);
-
+        const p1 = db[mode][type].find(i => i.name === winnerName);
+        const p2 = db[mode][type].find(i => i.name === loserName);
         const diff = Math.abs(p1.points - p2.points);
-        const handicap = diff; 
 
-        if (handicap === 0) {
-            hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Trận đấu cân bằng (Đồng banh).`;
+        if (handicapType === 'handicap') {
+            hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Chế độ: <strong>Chấp điểm ngoài đời (Đánh đồng Elo)</strong>. Kết quả thắng/thua sẽ cộng/trừ <span style="color:var(--accent); font-weight:bold;">16 pts cố định</span> cho cả hai cơ thủ.`;
         } else {
-            const cuaTren = p1.points > p2.points ? p1.name : p2.name;
-            const cuaDuoi = p1.points > p2.points ? p2.name : p1.name;
-            hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Kèo chấp: <strong>${cuaTren}</strong> chấp <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${handicap} điểm</span>`;
+            if (diff === 0) hintBox.innerHTML = `<i class="fa-solid fa-scale-balanced" style="color:var(--primary-hover)"></i> Không chấp điểm: Trận đấu cân bằng tự nhiên (Bằng Elo gốc).`;
+            else {
+                const cuaTren = p1.points > p2.points ? p1.name : p2.name;
+                const cuaDuoi = p1.points > p2.points ? p2.name : p1.name;
+                hintBox.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--warning)"></i> Không chấp điểm: Tính theo chênh lệch Elo gốc. <strong>${cuaTren}</strong> đang hơn <strong>${cuaDuoi}</strong> <span style="color:var(--accent); font-weight:bold;">${diff} Elo</span>.`;
+            }
         }
     }
 
     function loadManageDropdown(mode) {
         const prefix = mode === 'libre' ? 'libre' : 'threec';
         const type = document.getElementById(`${prefix}ManageType`).value;
-        document.getElementById(`${prefix}ManageTarget`).innerHTML = db[mode][type].map((i, idx) => `<option value="${idx}">${i.name} (${i.points} pts)</option>`).join('');
+        document.getElementById(`${prefix}ManageTarget`).innerHTML = db[mode][type].map((i, idx) => `<option value="${idx}">${i.name} (Gốc: ${i.initialPoints || 1200} pts)</option>`).join('');
     }
 
     function addNewEntry(mode) {
@@ -615,8 +660,9 @@
         const name = document.getElementById(`${prefix}AddName`).value.trim();
         const points = parseInt(document.getElementById(`${prefix}AddPoints`).value) || 1200;
         if(!name) return alert("Vui lòng điền tên!");
-        db[mode][type].push({ name, points, win: 0, loss: 0, streak: 0 });
+        db[mode][type].push({ name, initialPoints: points, points, win: 0, loss: 0, streak: 0 });
         document.getElementById(`${prefix}AddName`).value = '';
+        recalculateAllElo();
         initApp();
     }
 
@@ -633,30 +679,14 @@
 
         if (!customHandicap) {
             const type = document.getElementById(`${prefix}SchedType`).value;
-            const list = db[mode][type];
-            const p1 = list.find(i => i.name === p1Name);
-            const p2 = list.find(i => i.name === p2Name);
+            const p1 = db[mode][type].find(i => i.name === p1Name);
+            const p2 = db[mode][type].find(i => i.name === p2Name);
             const diff = Math.abs(p1.points - p2.points);
-            if (diff === 0) {
-                customHandicap = "Đồng banh";
-            } else {
-                const cuaTren = p1.points > p2.points ? p1.name : p2.name;
-                customHandicap = `${cuaTren} chấp ${diff}đ`;
-            }
+            customHandicap = diff === 0 ? "Đồng banh" : `${p1.points > p2.points ? p1.name : p2.name} chấp ${diff}đ`;
         }
 
-        db[mode].schedule.push({ 
-            date, 
-            time, 
-            p1: p1Name, 
-            p2: p2Name, 
-            handicap: customHandicap, 
-            status: document.getElementById(`${prefix}SchedStatus`).value 
-        });
-
-        document.getElementById(`${prefix}SchedDate`).value = '';
-        document.getElementById(`${prefix}SchedTime`).value = '';
-        document.getElementById(`${prefix}SchedCustomHandicap`).value = '';
+        db[mode].schedule.push({ date, time, p1: p1Name, p2: p2Name, handicap: customHandicap, status: document.getElementById(`${prefix}SchedStatus`).value });
+        document.getElementById(`${prefix}SchedDate`).value = ''; document.getElementById(`${prefix}SchedTime`).value = ''; document.getElementById(`${prefix}SchedCustomHandicap`).value = '';
         initApp();
     }
 
@@ -669,7 +699,11 @@
         const type = document.getElementById(`${prefix}ManageType`).value;
         const idx = document.getElementById(`${prefix}ManageTarget`).value;
         if (idx === "") return;
-        if(confirm("Xóa thành viên này?")) { db[mode][type].splice(idx, 1); initApp(); }
+        if(confirm("Xóa thành viên này? Điểm số và lịch sử đấu liên quan sẽ tính toán dựa trên các thành viên còn lại.")) { 
+            db[mode][type].splice(idx, 1); 
+            recalculateAllElo();
+            initApp(); 
+        }
     }
 
     function editPoints(mode) {
@@ -677,57 +711,97 @@
         const type = document.getElementById(`${prefix}ManageType`).value;
         const idx = document.getElementById(`${prefix}ManageTarget`).value;
         const item = db[mode][type][idx];
-        const newPoints = prompt(`Nhập điểm mới cho ${item.name}:`, item.points);
-        if (newPoints && !isNaN(newPoints)) { item.points = parseInt(newPoints); initApp(); }
+        const newPoints = prompt(`Nhập ĐIỂM GỐC ban đầu mới cho ${item.name}:`, item.initialPoints || 1200);
+        if (newPoints && !isNaN(newPoints)) { 
+            item.initialPoints = parseInt(newPoints); 
+            recalculateAllElo(); // Chạy lại hệ thống tính toán dựa trên điểm gốc mới
+            initApp(); 
+        }
+    }
+
+    // CHỨC NĂNG SỬA TRẬN ĐẤU: Điền dữ liệu cũ lên Form
+    function startEditMatch(mode, index) {
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const match = db[mode].history[index];
+
+        document.getElementById(`${prefix}MatchFormTitle`).innerText = `ĐANG SỬA TRẬN ĐẤU (Vị trí #${index + 1})`;
+        document.getElementById(`${prefix}EditMatchIndex`).value = index;
+        document.getElementById(`${prefix}MatchType`).value = match.type;
+        
+        // Load lại danh sách dropdown khớp với loại trận (solo/team)
+        loadDropdowns(mode);
+
+        document.getElementById(`${prefix}MatchWinner`).value = match.winner;
+        document.getElementById(`${prefix}MatchLoser`).value = match.loser;
+        document.getElementById(`${prefix}MatchHandicapType`).value = match.handicapType || 'handicap';
+        document.getElementById(`${prefix}MatchNote`).value = match.rawNote || '';
+
+        document.getElementById(`${prefix}BtnSaveMatch`).innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Cập nhật trận đấu`;
+        document.getElementById(`${prefix}BtnCancelEdit`).style.display = 'inline-flex';
+        
+        updateHandicapHint(mode);
+        
+        // Cuộn màn hình xuống vùng công cụ quản trị
+        document.getElementById(`${prefix}MatchFormTitle`).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEditMatch(mode) {
+        const prefix = mode === 'libre' ? 'libre' : 'threec';
+        document.getElementById(`${prefix}MatchFormTitle`).innerText = `Nhập kết quả trận đấu`;
+        document.getElementById(`${prefix}EditMatchIndex`).value = "-1";
+        document.getElementById(`${prefix}MatchNote`).value = '';
+        document.getElementById(`${prefix}BtnSaveMatch`).innerHTML = `<i class="fa-solid fa-check"></i> Lưu kết quả trận`;
+        document.getElementById(`${prefix}BtnCancelEdit`).style.display = 'none';
+        loadDropdowns(mode);
     }
 
     function deleteHistoryItem(mode, index) {
-        if(confirm("Xóa trận đấu này khỏi lịch sử?")) { db[mode].history.splice(index, 1); initApp(); }
+        if(confirm("Xóa trận đấu này khỏi lịch sử? Hệ thống sẽ hoàn tác và tính toán lại điểm Elo tự động.")) { 
+            db[mode].history.splice(index, 1); 
+            recalculateAllElo(); // Tính toán lại toàn bộ bảng xếp hạng sau khi xóa
+            initApp(); 
+        }
     }
 
     function recordMatch(mode) {
         const prefix = mode === 'libre' ? 'libre' : 'threec';
+        const editIndex = parseInt(document.getElementById(`${prefix}EditMatchIndex`).value);
+        
         const type = document.getElementById(`${prefix}MatchType`).value;
         const winnerName = document.getElementById(`${prefix}MatchWinner`).value;
         const loserName = document.getElementById(`${prefix}MatchLoser`).value;
-        let note = document.getElementById(`${prefix}MatchNote`).value.trim();
+        const handicapType = document.getElementById(`${prefix}MatchHandicapType`).value;
+        let rawNote = document.getElementById(`${prefix}MatchNote`).value.trim();
 
         if (winnerName === loserName) return alert("Người thắng và thua không được trùng nhau!");
 
-        const list = db[mode][type];
-        const winner = list.find(i => i.name === winnerName);
-        const loser = list.find(i => i.name === loserName);
+        const matchData = {
+            type,
+            winner: winnerName,
+            loser: loserName,
+            handicapType,
+            rawNote,
+            time: editIndex !== -1 ? db[mode].history[editIndex].time : getCurrentFormattedTime() // Giữ nguyên giờ cũ nếu là chỉnh sửa
+        };
 
-        const Ra = winner.points; const Rb = loser.points;
-        const Ea = 1 / (1 + Math.pow(10, (Rb - Ra) / 400)); 
-        let eloGain = Math.max(2, Math.round(32 * (1 - Ea)));
+        if (editIndex !== -1) {
+            // Chế độ chỉnh sửa: Ghi đè lên vị trí trận đấu cũ
+            db[mode].history[editIndex] = matchData;
+            cancelEditMatch(mode);
+            alert("Đã sửa đổi trận đấu! Hệ thống đang tính toán lại toàn bộ điểm Elo...");
+        } else {
+            // Chế độ thêm mới: Thêm vào cuối mảng lịch sử
+            db[mode].history.push(matchData);
+        }
 
-        const diff = Math.abs(Ra - Rb);
-        let handicapText = diff > 0 ? `(Elo: ${diff}đ)` : `(Bằng Elo)`;
-
-        winner.points += eloGain;
-        loser.points = Math.max(0, loser.points - eloGain); 
-        winner.win += 1; loser.loss += 1;
-
-        if (winner.streak === undefined) winner.streak = 0;
-        if (loser.streak === undefined) loser.streak = 0;
-
-        if (winner.streak >= 0) winner.streak += 1; else winner.streak = 1;
-        if (loser.streak <= 0) loser.streak -= 1; else loser.streak = -1;
-
-        const finalNote = note ? `${note} ${handicapText} (+${eloGain}/-${eloGain} pts)` : `${handicapText} (+${eloGain}/-${eloGain} pts)`;
-        db[mode].history.push({ 
-            type, winner: winnerName, loser: loserName, 
-            note: finalNote, time: getCurrentFormattedTime()
-        });
+        // TỰ ĐỘNG CẬP NHẬT LẠI TOÀN BỘ ĐIỂM ELO CHO CẢ HỆ THỐNG
+        recalculateAllElo();
 
         document.getElementById(`${prefix}MatchNote`).value = '';
         initApp();
     }
 
-    // Tự động cập nhật lại thời gian bảng mỗi 1 phút để cập nhật trạng thái "Kết thúc" theo thời gian thực
     setInterval(initApp, 60000);
-
     window.onload = pullFromGoogleSheet;
 </script>
 
