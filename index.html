@@ -338,7 +338,6 @@
     };
 
     // --- CẤU HÌNH QUỸ LIBRE ---
-    const FUND_FEE_PER_WIN = 10000; // Mỗi trận thắng đóng 10K vào quỹ
 
     let db = defaultData;
 
@@ -408,38 +407,6 @@
     }
 
     // --- QUẢN LÝ QUỸ LIBRE ---
-
-    // Tự động tạo khoản thu quỹ khi có 1 trận đấu MỚI được ghi nhận (người thắng đóng 10K)
-    function addFundTransactionForMatch(match) {
-        if (!db.libre.fund) db.libre.fund = { transactions: [] };
-        db.libre.fund.transactions.push({
-            time: match.time,
-            matchTime: match.time,
-            person: match.winner,
-            amount: FUND_FEE_PER_WIN,
-            note: `Phí thắng trận (thắng ${match.loser})`,
-            auto: true
-        });
-    }
-
-    // Khi SỬA 1 trận đấu, cập nhật lại khoản thu quỹ tự động tương ứng (nếu đổi người thắng)
-    function updateFundTransactionForMatch(match) {
-        if (!db.libre.fund) db.libre.fund = { transactions: [] };
-        const tx = db.libre.fund.transactions.find(t => t.auto && t.matchTime === match.time);
-        if (tx) {
-            tx.person = match.winner;
-            tx.note = `Phí thắng trận (thắng ${match.loser})`;
-        } else {
-            addFundTransactionForMatch(match);
-        }
-    }
-
-    // Khi XÓA 1 trận đấu, xóa luôn khoản thu quỹ tự động gắn với trận đó
-    function removeFundTransactionForMatch(match) {
-        if (!db.libre.fund || !match) return;
-        const idx = db.libre.fund.transactions.findIndex(t => t.auto && t.matchTime === match.time && t.person === match.winner);
-        if (idx !== -1) db.libre.fund.transactions.splice(idx, 1);
-    }
 
     // Thủ quỹ thêm giao dịch thu/chi thủ công (VD: bù trận hôm qua, chi tiêu chung...)
     function addFundTransaction() {
@@ -607,6 +574,16 @@
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} - ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
     }
 
+    // Đổi chuỗi "HH:MM - DD/MM/YYYY" thành "YYYY-MM-DD" để so sánh ngày
+    function extractDateFromMatchTime(timeStr) {
+        if (!timeStr) return null;
+        const parts = timeStr.split(' - ');
+        if (parts.length < 2) return null;
+        const dmy = parts[1].split('/');
+        if (dmy.length !== 3) return null;
+        return `${dmy[2]}-${dmy[1]}-${dmy[0]}`;
+    }
+
     function formatStreak(streak) {
         if (!streak || streak === 0) return `<span class="streak-badge" style="background:gray; color:#fff;">-</span>`;
         if (streak > 0) return `<span class="streak-badge streak-win">${streak}W</span>`;
@@ -670,11 +647,23 @@
             let resultText = '';
 
             if (s.date && s.time) {
-                const matchDateTime = new Date(`${s.date}T${s.time}`);
-                if (Math.floor((now - matchDateTime) / 1000 / 60) >= 120) { 
+                const foundHistory = currentData.history.find(h => {
+                    const sameMatch = (h.winner === s.p1 && h.loser === s.p2) || (h.winner === s.p2 && h.loser === s.p1);
+                    if (!sameMatch) return false;
+                    const hDate = extractDateFromMatchTime(h.time);
+                    return !hDate || hDate >= s.date; // chỉ tính các trận được ghi nhận từ đúng ngày hẹn lịch trở đi
+                });
+
+                if (foundHistory) {
+                    // Đã có kết quả trong Nhật Ký -> hiện Kết thúc ngay, không cần chờ hết giờ
                     statusClass = 'status-finished'; statusText = 'Kết thúc';
-                    const foundHistory = currentData.history.find(h => (h.winner === s.p1 && h.loser === s.p2) || (h.winner === s.p2 && h.loser === s.p1));
-                    resultText = foundHistory ? `<br><span style="color:var(--primary-hover); font-size:0.8rem; font-weight:bold;"><i class="fa-solid fa-square-poll-horizontal"></i> ${foundHistory.winner} thắng</span>` : `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Hết giờ)</span>`;
+                    resultText = `<br><span style="color:var(--primary-hover); font-size:0.8rem; font-weight:bold;"><i class="fa-solid fa-square-poll-horizontal"></i> ${foundHistory.winner} thắng</span>`;
+                } else {
+                    const matchDateTime = new Date(`${s.date}T${s.time}`);
+                    if (Math.floor((now - matchDateTime) / 1000 / 60) >= 120) { 
+                        statusClass = 'status-finished'; statusText = 'Kết thúc';
+                        resultText = `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Hết giờ)</span>`;
+                    }
                 }
             }
 
@@ -889,7 +878,6 @@
 
     function deleteHistoryItem(mode, index) {
         if(confirm("Xóa trận đấu này khỏi lịch sử? Hệ thống sẽ hoàn tác và tính toán lại điểm Elo tự động.")) { 
-            if (mode === 'libre') removeFundTransactionForMatch(db.libre.history[index]); // Xóa luôn khoản thu quỹ gắn với trận này
             db[mode].history.splice(index, 1); 
             recalculateAllElo(); // Tính toán lại toàn bộ bảng xếp hạng sau khi xóa
             initApp(); 
@@ -920,13 +908,11 @@
         if (editIndex !== -1) {
             // Chế độ chỉnh sửa: Ghi đè lên vị trí trận đấu cũ
             db[mode].history[editIndex] = matchData;
-            if (mode === 'libre') updateFundTransactionForMatch(matchData); // Cập nhật lại khoản thu quỹ nếu người thắng thay đổi
             cancelEditMatch(mode);
             alert("Đã sửa đổi trận đấu! Hệ thống đang tính toán lại toàn bộ điểm Elo...");
         } else {
             // Chế độ thêm mới: Thêm vào cuối mảng lịch sử
             db[mode].history.push(matchData);
-            if (mode === 'libre') addFundTransactionForMatch(matchData); // Tự động cộng 10K vào quỹ cho người thắng
         }
 
         // TỰ ĐỘNG CẬP NHẬT LẠI TOÀN BỘ ĐIỂM ELO CHO CẢ HỆ THỐNG
