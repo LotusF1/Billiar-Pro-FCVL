@@ -215,7 +215,7 @@
                             <div class="handicap-box" id="libreSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
                             <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="libreSchedCustomHandicap" placeholder="Ví dụ: Chấp 15 điểm..."></div>
-                            <div class="form-group"><select id="libreSchedStatus"><option value="waiting">Sắp diễn ra</option><option value="playing">Đang đánh</option></select></div>
+                            <div class="form-group"><select id="libreSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('libre')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
                     </div>
@@ -279,7 +279,7 @@
                             <div class="handicap-box" id="threecSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
                             <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="threecSchedCustomHandicap" placeholder="Ví dụ: Chấp 3 băng..."></div>
-                            <div class="form-group"><select id="threecSchedStatus"><option value="waiting">Sắp diễn ra</option><option value="playing">Đang đánh</option></select></div>
+                            <div class="form-group"><select id="threecSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('3c')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
                     </div>
@@ -667,7 +667,7 @@
             visibleCount++;
 
             let statusClass = s.status === 'playing' ? 'status-playing' : 'status-waiting';
-            let statusText = s.status === 'playing' ? 'Đang đánh' : 'Sắp diễn ra';
+            let statusText = s.status === 'playing' ? 'Đang đánh' : 'Đang chờ';
             let resultText = '';
 
             if (s.date && s.time) {
