@@ -155,8 +155,27 @@
                 <div class="table-responsive"><table><thead><tr><th>Thời gian</th><th>Trận đấu</th><th>Kèo Chấp</th><th>Trạng thái</th><th class="admin-action-header" style="display:none; width:45px; text-align:center;">Xóa</th></tr></thead><tbody id="threecScheduleBody"></tbody></table></div>
             </div>
             <div class="card"><div class="card-title"><i class="fa-solid fa-history"></i> Nhật Ký Trận Đấu 3C</div><div class="history-list" id="threecHistoryList"></div></div>
+
+            <div class="card" id="libreFundCard" style="border-color: rgba(245, 158, 11, 0.4);">
+                <div class="card-title" style="color: var(--warning);"><i class="fa-solid fa-sack-dollar"></i> Quỹ Libre (Thủ Quỹ)</div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; border-radius:8px; padding:12px 15px; margin-bottom:1rem; border:1px solid #334155;">
+                    <span style="color:var(--text-muted); font-size:0.85rem;">Số dư quỹ hiện tại</span>
+                    <span id="libreFundBalance" style="font-size:1.4rem; font-weight:800; color:var(--warning);">0đ</span>
+                </div>
+
+                <div id="libreFundAdminTools" style="display:none; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed #475569;">
+                    <div class="form-group"><label>Người nộp/nhận (để trống nếu là chi tiêu chung)</label><input type="text" id="libreFundPerson" placeholder="Tên cơ thủ..."></div>
+                    <div class="form-group"><label>Số tiền (nhập số ÂM nếu là khoản CHI)</label><input type="number" id="libreFundAmount" placeholder="Ví dụ: 10000 hoặc -50000"></div>
+                    <div class="form-group"><label>Ghi chú (bắt buộc, để minh bạch)</label><input type="text" id="libreFundNote" placeholder="Lý do thu/chi..."></div>
+                    <button class="btn" style="background: var(--warning); color:#000;" onclick="addFundTransaction()"><i class="fa-solid fa-plus"></i> Thêm giao dịch quỹ</button>
+                </div>
+
+                <div class="history-list" id="libreFundList" style="max-height:280px;"></div>
+            </div>
         </div>
     </div>
+
 
     <div class="admin-section" id="adminSectionArea">
         <div class="card" style="border: 2px solid var(--accent); background: #0f172a; margin-bottom: 1.5rem;">
@@ -191,7 +210,7 @@
                             <div class="handicap-box" id="libreSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
                             <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="libreSchedCustomHandicap" placeholder="Ví dụ: Chấp 15 điểm..."></div>
-                            <div class="form-group"><select id="libreSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
+                            <div class="form-group"><select id="libreSchedStatus"><option value="waiting">Sắp diễn ra</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('libre')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
                     </div>
@@ -255,7 +274,7 @@
                             <div class="handicap-box" id="threecSchedHandicapHint"><i class="fa-solid fa-calculator"></i> Hãy chọn cặp đấu để xem gợi ý.</div>
                             
                             <div class="form-group"><label>Điểm chấp thực tế (Bạn tự điền)</label><input type="text" id="threecSchedCustomHandicap" placeholder="Ví dụ: Chấp 3 băng..."></div>
-                            <div class="form-group"><select id="threecSchedStatus"><option value="waiting">Đang chờ</option><option value="playing">Đang đánh</option></select></div>
+                            <div class="form-group"><select id="threecSchedStatus"><option value="waiting">Sắp diễn ra</option><option value="playing">Đang đánh</option></select></div>
                             <button class="btn" style="background: var(--warning); color:#000;" onclick="addSchedule('3c')"><i class="fa-solid fa-calendar-plus"></i> Thêm vào lịch</button>
                         </div>
                     </div>
@@ -310,9 +329,12 @@
     let isAdminActive = false;
 
     const defaultData = {
-        libre: { solo: [], team: [], schedule: [], history: [] },
+        libre: { solo: [], team: [], schedule: [], history: [], fund: { transactions: [] } },
         '3c': { solo: [], team: [], schedule: [], history: [] }
     };
+
+    // --- CẤU HÌNH QUỸ LIBRE ---
+    const FUND_FEE_PER_WIN = 10000; // Mỗi trận thắng đóng 10K vào quỹ
 
     let db = defaultData;
 
@@ -329,6 +351,8 @@
             if(!db[mode].history) db[mode].history = [];
             if(!db[mode].schedule) db[mode].schedule = [];
         });
+        if(!db.libre.fund) db.libre.fund = { transactions: [] };
+        if(!db.libre.fund.transactions) db.libre.fund.transactions = [];
     }
 
     // HÀM QUAN TRỌNG: Tự động chạy lại toàn bộ lịch sử trận đấu để tính điểm Elo và Chuỗi (Streak) từ đầu
@@ -377,6 +401,107 @@
                 match.note = `[${modeText}] ${match.rawNote ? match.rawNote + ' ' : ''}(+${eloGain}/-${eloGain} pts)`;
             });
         });
+    }
+
+    // --- QUẢN LÝ QUỸ LIBRE ---
+
+    // Tự động tạo khoản thu quỹ khi có 1 trận đấu MỚI được ghi nhận (người thắng đóng 10K)
+    function addFundTransactionForMatch(match) {
+        if (!db.libre.fund) db.libre.fund = { transactions: [] };
+        db.libre.fund.transactions.push({
+            time: match.time,
+            matchTime: match.time,
+            person: match.winner,
+            amount: FUND_FEE_PER_WIN,
+            note: `Phí thắng trận (thắng ${match.loser})`,
+            auto: true
+        });
+    }
+
+    // Khi SỬA 1 trận đấu, cập nhật lại khoản thu quỹ tự động tương ứng (nếu đổi người thắng)
+    function updateFundTransactionForMatch(match) {
+        if (!db.libre.fund) db.libre.fund = { transactions: [] };
+        const tx = db.libre.fund.transactions.find(t => t.auto && t.matchTime === match.time);
+        if (tx) {
+            tx.person = match.winner;
+            tx.note = `Phí thắng trận (thắng ${match.loser})`;
+        } else {
+            addFundTransactionForMatch(match);
+        }
+    }
+
+    // Khi XÓA 1 trận đấu, xóa luôn khoản thu quỹ tự động gắn với trận đó
+    function removeFundTransactionForMatch(match) {
+        if (!db.libre.fund || !match) return;
+        const idx = db.libre.fund.transactions.findIndex(t => t.auto && t.matchTime === match.time && t.person === match.winner);
+        if (idx !== -1) db.libre.fund.transactions.splice(idx, 1);
+    }
+
+    // Thủ quỹ thêm giao dịch thu/chi thủ công (VD: bù trận hôm qua, chi tiêu chung...)
+    function addFundTransaction() {
+        if (!isAdminActive) return;
+        const person = document.getElementById('libreFundPerson').value.trim();
+        const amountRaw = document.getElementById('libreFundAmount').value;
+        const amount = parseInt(amountRaw);
+        const note = document.getElementById('libreFundNote').value.trim();
+
+        if (amountRaw === '' || isNaN(amount) || amount === 0) return alert("Vui lòng nhập số tiền hợp lệ (khác 0)!");
+        if (!note) return alert("Vui lòng nhập ghi chú lý do thu/chi để mọi người cùng minh bạch theo dõi!");
+
+        db.libre.fund.transactions.push({
+            time: getCurrentFormattedTime(),
+            person: person || '—',
+            amount,
+            note,
+            auto: false
+        });
+
+        document.getElementById('libreFundPerson').value = '';
+        document.getElementById('libreFundAmount').value = '';
+        document.getElementById('libreFundNote').value = '';
+        initApp();
+    }
+
+    function deleteFundTransaction(index) {
+        if (!isAdminActive) return;
+        const tx = db.libre.fund.transactions[index];
+        if (!tx) return;
+        if (tx.auto) {
+            alert("Đây là khoản thu tự động gắn với 1 trận đấu. Hãy Sửa hoặc Xóa đúng trận đấu đó trong Nhật Ký Trận Đấu Libre để quỹ tự cập nhật lại cho khớp.");
+            return;
+        }
+        if (confirm("Xóa giao dịch quỹ này?")) { db.libre.fund.transactions.splice(index, 1); initApp(); }
+    }
+
+    function renderFundLibre() {
+        const fund = db.libre.fund || { transactions: [] };
+        const balance = fund.transactions.reduce((sum, t) => sum + t.amount, 0);
+
+        const balanceEl = document.getElementById('libreFundBalance');
+        if (balanceEl) balanceEl.innerText = balance.toLocaleString('vi-VN') + 'đ';
+
+        const adminTools = document.getElementById('libreFundAdminTools');
+        if (adminTools) adminTools.style.display = isAdminActive ? 'block' : 'none';
+
+        const list = document.getElementById('libreFundList');
+        if (list) {
+            list.innerHTML = fund.transactions.length === 0 ? '<div style="color:var(--text-muted); text-align:center; padding:1rem;">Quỹ chưa có giao dịch nào</div>' : '';
+            for (let i = fund.transactions.length - 1; i >= 0; i--) {
+                const t = fund.transactions[i];
+                const isIncome = t.amount >= 0;
+                const amountText = (isIncome ? '+' : '') + t.amount.toLocaleString('vi-VN') + 'đ';
+                const deleteBtn = (isAdminActive && !t.auto) ? `<button class="btn-delete-item" onclick="deleteFundTransaction(${i})" title="Xóa giao dịch"><i class="fa-solid fa-trash-can"></i></button>` : '';
+                list.innerHTML += `
+                    <div class="history-item" style="border-left-color: ${isIncome ? 'var(--primary)' : 'var(--danger)'};">
+                        <div class="history-content">
+                            <span class="time-badge"><i class="fa-regular fa-clock"></i> ${t.time || ''}</span>
+                            <strong style="color:${isIncome ? 'var(--primary-hover)' : 'var(--danger)'};">${amountText}</strong>${t.person && t.person !== '—' ? ` — <span style="color:var(--accent); font-weight:600;">${t.person}</span>` : ''}
+                            <div style="margin-top: 2px; font-size:0.75rem; color:var(--silver);">${t.note || ''}${t.auto ? ' <span style="color:var(--text-muted);">(tự động)</span>' : ''}</div>
+                        </div>
+                        <div class="history-actions" style="display:flex;">${deleteBtn}</div>
+                    </div>`;
+            }
+        }
     }
 
     async function pullFromGoogleSheet() {
@@ -462,6 +587,7 @@
     function initApp() {
         renderRankings('libre', 'libreSoloBody', 'libreTeamBody', 'libreHistoryList', 'libreScheduleBody');
         renderRankings('3c', 'threecSoloBody', 'threecTeamBody', 'threecHistoryList', 'threecScheduleBody');
+        renderFundLibre();
         if (isAdminActive) {
             loadDropdowns('libre'); loadDropdowns('3c');
             loadSchedDropdowns('libre'); loadSchedDropdowns('3c');
@@ -483,8 +609,10 @@
         return `<span class="streak-badge streak-loss">${Math.abs(streak)}L</span>`;
     }
 
-    function formatDateVietnameseWithDay(dateStr) {
+    function formatDateVietnameseWithDay(dateStr, todayStr) {
         if(!dateStr) return '';
+        if (todayStr && dateStr === todayStr) return `<span style="color:var(--primary-hover); font-weight:bold;">Hôm nay</span>`;
+
         const parts = dateStr.split('-');
         if(parts.length !== 3) return dateStr;
         
@@ -534,7 +662,7 @@
             visibleCount++;
 
             let statusClass = s.status === 'playing' ? 'status-playing' : 'status-waiting';
-            let statusText = s.status === 'playing' ? 'Đang đánh' : 'Đang chờ';
+            let statusText = s.status === 'playing' ? 'Đang đánh' : 'Sắp diễn ra';
             let resultText = '';
 
             if (s.date && s.time) {
@@ -548,7 +676,7 @@
 
             const deleteActionStyle = isAdminActive ? 'display: table-cell;' : 'display: none;';
             schedBody.innerHTML += `<tr>
-                <td style="color:var(--accent); font-weight:600; font-size:0.85rem; line-height:1.3;">${s.time || ''}<br><span style="font-size:0.75rem; color:var(--text-muted);">${formatDateVietnameseWithDay(s.date)}</span></td>
+                <td style="color:var(--accent); font-weight:600; font-size:0.85rem; line-height:1.3;">${s.time || ''}<br><span style="font-size:0.75rem; color:var(--text-muted);">${formatDateVietnameseWithDay(s.date, todayStr)}</span></td>
                 <td style="line-height:1.3;"><strong>${s.p1}</strong><br><span style="color:var(--text-muted);font-size:0.8rem;">vs</span><br><strong>${s.p2}</strong></td>
                 <td style="color:var(--warning); font-weight:bold; font-size:0.85rem;">${s.handicap || 'Đang tính'}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span>${resultText}</td>
@@ -757,6 +885,7 @@
 
     function deleteHistoryItem(mode, index) {
         if(confirm("Xóa trận đấu này khỏi lịch sử? Hệ thống sẽ hoàn tác và tính toán lại điểm Elo tự động.")) { 
+            if (mode === 'libre') removeFundTransactionForMatch(db.libre.history[index]); // Xóa luôn khoản thu quỹ gắn với trận này
             db[mode].history.splice(index, 1); 
             recalculateAllElo(); // Tính toán lại toàn bộ bảng xếp hạng sau khi xóa
             initApp(); 
@@ -787,11 +916,13 @@
         if (editIndex !== -1) {
             // Chế độ chỉnh sửa: Ghi đè lên vị trí trận đấu cũ
             db[mode].history[editIndex] = matchData;
+            if (mode === 'libre') updateFundTransactionForMatch(matchData); // Cập nhật lại khoản thu quỹ nếu người thắng thay đổi
             cancelEditMatch(mode);
             alert("Đã sửa đổi trận đấu! Hệ thống đang tính toán lại toàn bộ điểm Elo...");
         } else {
             // Chế độ thêm mới: Thêm vào cuối mảng lịch sử
             db[mode].history.push(matchData);
+            if (mode === 'libre') addFundTransactionForMatch(matchData); // Tự động cộng 10K vào quỹ cho người thắng
         }
 
         // TỰ ĐỘNG CẬP NHẬT LẠI TOÀN BỘ ĐIỂM ELO CHO CẢ HỆ THỐNG
